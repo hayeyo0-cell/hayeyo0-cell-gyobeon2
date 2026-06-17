@@ -2168,23 +2168,12 @@ function getPersonGyobunForDate(data, remoteRoster, teamKey, name, dateStr, over
 }
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App />);
-// app.js 상단 혹은 컴포넌트 내부에서 실행
-db.collection("test").add({
-  message: "DutyFlow 연결 성공!",
-  time: new Date()
-})
-.then(() => console.log("Firebase에 데이터가 저장되었습니다!"))
-.catch((err) => console.error("에러 발생: ", err));
-// --- [여기에 아래 코드를 추가하세요] ---
-
 // 1. 휴가 신청 폼 컴포넌트 추가
 function VacationForm() {
   const [formData, setFormData] = React.useState({ name: '', date: '', type: '연차' });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Firebase에 데이터 저장
     db.collection("vacations").add({
       ...formData,
       createdAt: new Date()
@@ -2209,13 +2198,12 @@ function VacationForm() {
   );
 }
 
-// 2. 기존 App 컴포넌트 내용을 아래처럼 수정 (이미 있다면 교체하세요)
-function App() {
-  return (
-    <div style={{ maxWidth: '400px', margin: '0 auto' }}>
-      <h1 style={{ color: 'white', textAlign: 'center' }}>DutyFlow</h1>
-      <VacationForm />
-      <VacationView />
-    </div>
-  );
+// 2. 휴가 현황 표 컴포넌트 추가
+function VacationView() {
+  return <div style={{ color: 'white', padding: '20px', textAlign: 'center' }}>휴가 내역이 여기에 표시됩니다.</div>;
 }
+
+// 3. 앱 실행 명령 (마지막에 위치해야 합니다)
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+
