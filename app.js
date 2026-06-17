@@ -2169,3 +2169,10 @@ function getPersonGyobunForDate(data, remoteRoster, teamKey, name, dateStr, over
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);
+// app.js 상단 혹은 컴포넌트 내부에서 실행
+db.collection("test").add({
+  message: "DutyFlow 연결 성공!",
+  time: new Date()
+})
+.then(() => console.log("Firebase에 데이터가 저장되었습니다!"))
+.catch((err) => console.error("에러 발생: ", err));
