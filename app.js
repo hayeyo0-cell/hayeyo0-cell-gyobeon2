@@ -2168,6 +2168,7 @@ function getPersonGyobunForDate(data, remoteRoster, teamKey, name, dateStr, over
 }
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+
 // 1. 휴가 신청 폼 컴포넌트 추가
 function VacationForm() {
   const [formData, setFormData] = React.useState({ name: '', date: '', type: '연차' });
@@ -2207,3 +2208,5 @@ function VacationView() {
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);
 
+
+  }
