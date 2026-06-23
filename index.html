@@ -5,40 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>교번 앱</title>
 
-  <!-- 메타 태그 및 스타일 -->
   <link rel="manifest" href="manifest.json?v=20260617" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260617" />
   <meta name="theme-color" content="#0f172a" /> 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
   <link rel="stylesheet" href="style.css?v=3" />
 
-  <!-- 라이브러리 (React, Babel 등) -->
   <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone@7.23.5/babel.min.js"></script>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDeqrI_bvEJ7B1KsiZDBpCPD3kiDm7BJb4",
-      authDomain: "dutyflow-aba4f.firebaseapp.com",
-      projectId: "dutyflow-aba4f",
-      storageBucket: "dutyflow-aba4f.firebasestorage.app",
-      messagingSenderId: "989526388340",
-      appId: "1:989526388340:web:4a47624960828d9f56ab21",
-      measurementId: "G-JKFJCD9F04"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-  </script>
 </head>
-
 <body style="margin: 0; padding: 0; background-color: #0f172a;">
   <div id="root"></div>
+
   <script type="text/babel" data-presets="react" src="app.js?v=20260617NEW"></script>
 </body>
 </html>
