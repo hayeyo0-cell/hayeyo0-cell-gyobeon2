@@ -1598,16 +1598,9 @@ useEffect(() => {
                     )}
                   </div>
                       {/* 🚀 휴가 현황 카드 (접기/펼치기) */}
-                {/* 🚀 휴가 현황 카드 (세로 배치형) */}
                 <div className="card" style={{ marginTop: '15px', width: '100%' }}>
                   <div 
-                    style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between', 
-                      alignItems: 'center', 
-                      cursor: 'pointer', 
-                      padding: '10px 5px' 
-                    }}
+                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', padding: '10px 5px' }}
                     onClick={() => setShowVacation(!showVacation)}
                   >
                     <h3 style={{ margin: 0, fontSize: '16px', color: isDarkMode ? '#e2e8f0' : '#1e293b' }}>
