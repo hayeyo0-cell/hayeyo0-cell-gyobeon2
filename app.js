@@ -2168,45 +2168,4 @@ function getPersonGyobunForDate(data, remoteRoster, teamKey, name, dateStr, over
 }
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-
-// 1. 휴가 신청 폼 컴포넌트 추가
-function VacationForm() {
-  const [formData, setFormData] = React.useState({ name: '', date: '', type: '연차' });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    db.collection("vacations").add({
-      ...formData,
-      createdAt: new Date()
-    }).then(() => {
-      alert("신청 완료!");
-      setFormData({ name: '', date: '', type: '연차' });
-    });
-  };
-
-  return (
-    <form onSubmit={handleSubmit} style={{ padding: '20px', backgroundColor: '#1e293b', borderRadius: '8px', marginBottom: '20px', color: 'white' }}>
-      <h3 style={{ marginTop: '0' }}>휴가 신청</h3>
-      <input type="text" placeholder="성명" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} style={{width: '100%', marginBottom: '10px', padding: '8px'}} />
-      <input type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} style={{width: '100%', marginBottom: '10px', padding: '8px'}} />
-      <select value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})} style={{width: '100%', marginBottom: '10px', padding: '8px'}}>
-        <option value="연차">연차</option>
-        <option value="경조사">경조사</option>
-        <option value="병가">병가</option>
-      </select>
-      <button type="submit" style={{width: '100%', padding: '10px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px'}}>신청하기</button>
-    </form>
-  );
-}
-
-// 2. 휴가 현황 표 컴포넌트 추가
-function VacationView() {
-  return <div style={{ color: 'white', padding: '20px', textAlign: 'center' }}>휴가 내역이 여기에 표시됩니다.</div>;
-}
-
-// 3. 앱 실행 명령 (마지막에 위치해야 합니다)
-const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);
-
-
-  }
