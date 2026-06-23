@@ -1629,8 +1629,6 @@ useEffect(() => {
                     </div>
                   )}
                 </div>
-            )}
-
             {(activeTab === "all" || activeTab === "dia") && (
               <div className="tab-page all-page">
                 <div className="all-tab-header">
