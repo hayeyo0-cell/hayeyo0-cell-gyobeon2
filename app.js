@@ -542,6 +542,9 @@ function App() {
   const [holidayVersion, setHolidayVersion] = useState(0);
   const [wordtimeVersion, setWorktimeVersion] = useState(0);
   const [activeTab, setActiveTab] = useState("home");
+  // [찾은 줄 바로 아래에 추가]
+const [vacationData, setVacationData] = useState([]); // 휴가 데이터 저장용
+const [showVacation, setShowVacation] = useState(false); // 휴가 카드 접기/펼치기용
   const activeTabRef = useRef("home");
 
   const [selectedTeam, setSelectedTeam] = useState(initialSelection?.teamKey || "ks");
