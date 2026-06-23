@@ -719,6 +719,13 @@ const [showVacation, setShowVacation] = useState(false); // 휴가 카드 접기
   useEffect(() => { if (!allowProfileEdit) return; const teamKey = draftTeam || "ks"; const currentName = String(draftName || "").trim(); if (!currentName) return; const team = setupSourceData?.[draftTeam] || data?.[draftTeam]; if (!team) return; if (String(draftCode || "").trim()) return; let nextCode = ""; const remoteRow = findRemoteRowByName(teamKey, currentName, remoteRoster); if (remoteRow?.code) { nextCode = normalizeToFixedCode(team, remoteRow.code); } else { const zipPerson = findZipPersonByName(team, currentName); if (zipPerson?.baseCode) { nextCode = normalizeToFixedCode(team, zipPerson.baseCode); } } if (!nextCode) return; setDraftCode(nextCode); }, [ allowProfileEdit, draftTeam, draftName, draftCode, remoteRoster, setupSourceData, data, ]);
   useEffect(() => { const nextMonth = getDisplayMonthValue(groupBaseDate); if (groupMonth !== nextMonth) { setGroupMonth(nextMonth); } }, [groupBaseDate, groupMonth]);
   useEffect(() => { showSearchRef.current = showSearch; }, [showSearch]);
+  // [useEffect 모여있는 곳에 추가]
+useEffect(() => {
+  fetch("https://script.google.com/macros/s/AKfycby_p9K5jW7LTxAGy_uTTV88KcEGtnFQAEy7UctYq4Xkv2lpTj5RtR-mOACfic_BmE29kQ/exec")
+    .then(res => res.json())
+    .then(res => { if(res.ok) setVacationData(res.vacations); })
+    .catch(err => console.error("휴가 데이터 로드 실패", err));
+}, []);
 
   function syncMySelectionFromRemote(nextRemoteRoster, nextDataOverride = null) {
     const currentTeamKey = mySelection?.teamKey || ""; const currentName = String(mySelection?.name || "").trim(); if (!currentTeamKey || !currentName) return;
