@@ -542,9 +542,6 @@ function App() {
   const [holidayVersion, setHolidayVersion] = useState(0);
   const [wordtimeVersion, setWorktimeVersion] = useState(0);
   const [activeTab, setActiveTab] = useState("home");
-  // [찾은 줄 바로 아래에 추가]
-const [vacationData, setVacationData] = useState([]); // 휴가 데이터 저장용
-const [showVacation, setShowVacation] = useState(false); // 휴가 카드 접기/펼치기용
   const activeTabRef = useRef("home");
 
   const [selectedTeam, setSelectedTeam] = useState(initialSelection?.teamKey || "ks");
@@ -719,13 +716,6 @@ const [showVacation, setShowVacation] = useState(false); // 휴가 카드 접기
   useEffect(() => { if (!allowProfileEdit) return; const teamKey = draftTeam || "ks"; const currentName = String(draftName || "").trim(); if (!currentName) return; const team = setupSourceData?.[draftTeam] || data?.[draftTeam]; if (!team) return; if (String(draftCode || "").trim()) return; let nextCode = ""; const remoteRow = findRemoteRowByName(teamKey, currentName, remoteRoster); if (remoteRow?.code) { nextCode = normalizeToFixedCode(team, remoteRow.code); } else { const zipPerson = findZipPersonByName(team, currentName); if (zipPerson?.baseCode) { nextCode = normalizeToFixedCode(team, zipPerson.baseCode); } } if (!nextCode) return; setDraftCode(nextCode); }, [ allowProfileEdit, draftTeam, draftName, draftCode, remoteRoster, setupSourceData, data, ]);
   useEffect(() => { const nextMonth = getDisplayMonthValue(groupBaseDate); if (groupMonth !== nextMonth) { setGroupMonth(nextMonth); } }, [groupBaseDate, groupMonth]);
   useEffect(() => { showSearchRef.current = showSearch; }, [showSearch]);
-  // [useEffect 모여있는 곳에 추가]
-useEffect(() => {
-  fetch("https://script.google.com/macros/s/AKfycby_p9K5jW7LTxAGy_uTTV88KcEGtnFQAEy7UctYq4Xkv2lpTj5RtR-mOACfic_BmE29kQ/exec")
-    .then(res => res.json())
-    .then(res => { if(res.ok) setVacationData(res.vacations); })
-    .catch(err => console.error("휴가 데이터 로드 실패", err));
-}, []);
 
   function syncMySelectionFromRemote(nextRemoteRoster, nextDataOverride = null) {
     const currentTeamKey = mySelection?.teamKey || ""; const currentName = String(mySelection?.name || "").trim(); if (!currentTeamKey || !currentName) return;
@@ -1596,39 +1586,11 @@ useEffect(() => {
                         <div className="preview-label">🔍 터치해서 크게 보기</div>
                       </div>
                     )}
-                  </div> {/* main-panel 닫기 */}
-  
- {/* 🚀 휴가 현황 카드 (독립 배치) */}
-                <div className="card" style={{ marginTop: '20px', width: '100%' }}>
-                  <div 
-                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', padding: '15px' }}
-                    onClick={() => setShowVacation(!showVacation)}
-                  >
-                    <h3 style={{ margin: 0, fontSize: '16px', color: isDarkMode ? '#e2e8f0' : '#1e293b' }}>
-                      📋 오늘 휴가 {vacationData.filter(v => v.date === homeDate && v.cancelled !== true).length}명 🔄
-                    </h3>
-                    <span style={{ fontSize: '18px' }}>{showVacation ? '▲' : '▼'}</span>
                   </div>
-
-                  {showVacation && (
-                    <div style={{ padding: '15px', borderTop: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0' }}>
-                      {vacationData.filter(v => v.date === homeDate && v.cancelled !== true).length === 0 ? (
-                        <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '14px' }}>오늘 휴가자가 없습니다.</div>
-                      ) : (
-                        vacationData.filter(v => v.date === homeDate && v.cancelled !== true).map((v, i) => (
-                          <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '6px 0', fontSize: '14px' }}>
-                            <span style={{ marginRight: '8px' }}>{v.category === 'vacation' ? '🏖️' : v.category === 'sick' ? '🏥' : '⬜'}</span>
-                            <span style={{ fontWeight: 'bold', minWidth: '70px' }}>
-                              {v.category === 'vacation' ? `휴가${v.vacationSeq || ''}` : v.type}
-                            </span>
-                            <span style={{ margin: '0 8px' }}>-</span>
-                            <span style={{ color: '#64748b' }}>{v.dia || ""}</span>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  )}
                 </div>
+              </>
+            )}
+
             {(activeTab === "all" || activeTab === "dia") && (
               <div className="tab-page all-page">
                 <div className="all-tab-header">
