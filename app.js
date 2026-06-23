@@ -1598,39 +1598,37 @@ useEffect(() => {
                     )}
                   </div> {/* main-panel 닫기 */}
   
- {/* 🚀 휴가 현황 카드 (독립 배치) */}
-  <div className="card" style={{ marginTop: '15px', width: '100%' }}>
-    <div 
-      style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', padding: '10px' }}
-      onClick={() => setShowVacation(!showVacation)}
-    >
-      <h3 style={{ margin: 0, fontSize: '16px', color: isDarkMode ? '#e2e8f0' : '#1e293b' }}>
-        📋 오늘 휴가 {vacationData.filter(v => v.date === homeDate).length}명 🔄
-      </h3>
-      <span style={{ fontSize: '18px' }}>{showVacation ? '▲' : '▼'}</span>
-    </div>
+ {/* 🚀 독립형 휴가 현황 카드 */}
+                <div className="card" style={{ marginTop: '20px', width: '100%' }}>
+                  <div 
+                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', padding: '15px' }}
+                    onClick={() => setShowVacation(!showVacation)}
+                  >
+                    <h3 style={{ margin: 0, fontSize: '16px', color: isDarkMode ? '#e2e8f0' : '#1e293b' }}>
+                      📋 오늘 휴가 {vacationData.filter(v => v.date === homeDate && v.cancelled !== true).length}명 🔄
+                    </h3>
+                    <span style={{ fontSize: '18px' }}>{showVacation ? '▲' : '▼'}</span>
+                  </div>
 
-    {showVacation && (
-      <div style={{ padding: '10px', borderTop: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0' }}>
-        {vacationData.filter(v => v.date === homeDate).length === 0 ? (
-          <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '14px', padding: '10px' }}>오늘 휴가자가 없습니다.</div>
-        ) : (
-          vacationData.filter(v => v.date === homeDate).map((v, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '6px 0', fontSize: '14px' }}>
-              <span style={{ marginRight: '8px' }}>{v.category === 'vacation' ? '🏖️' : v.category === 'sick' ? '🏥' : '⬜'}</span>
-              <span style={{ fontWeight: 'bold', minWidth: '60px' }}>
-                {v.category === 'vacation' ? `휴가${v.vacationSeq || ''}` : v.type}
-              </span>
-              <span style={{ margin: '0 8px' }}>-</span>
-              <span style={{ color: '#64748b' }}>{v.dia || ""}</span>
-            </div>
-          ))
-        )}
-      </div>
-    )}
-  </div>
+                  {showVacation && (
+                    <div style={{ padding: '15px', borderTop: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0' }}>
+                      {vacationData.filter(v => v.date === homeDate && v.cancelled !== true).length === 0 ? (
+                        <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '14px' }}>오늘 휴가자가 없습니다.</div>
+                      ) : (
+                        vacationData.filter(v => v.date === homeDate && v.cancelled !== true).map((v, i) => (
+                          <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '6px 0', fontSize: '14px' }}>
+                            <span style={{ marginRight: '8px' }}>{v.category === 'vacation' ? '🏖️' : v.category === 'sick' ? '🏥' : '⬜'}</span>
+                            <span style={{ fontWeight: 'bold', minWidth: '70px' }}>
+                              {v.category === 'vacation' ? `휴가${v.vacationSeq || ''}` : v.type}
+                            </span>
+                            <span style={{ margin: '0 8px' }}>-</span>
+                            <span style={{ color: '#64748b' }}>{v.dia || ""}</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
-              </>
             )}
 
             {(activeTab === "all" || activeTab === "dia") && (
