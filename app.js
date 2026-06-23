@@ -1597,56 +1597,56 @@ useEffect(() => {
                       </div>
                     )}
                   </div>
-                      {/* 🚀 휴가 현황 카드 (접기/펼치기) */}
-                <div className="card" style={{ marginTop: '15px' }}>
-                  <div 
-                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', padding: '5px' }}
-                    onClick={() => setShowVacation(!showVacation)}
-                  >
-                    <h3 style={{ margin: 0, fontSize: '16px', color: isDarkMode ? '#e2e8f0' : '#1e293b' }}>
-                      📋 오늘 휴가 {vacationData.filter(v => v.date === homeDate).length}명 🔄
-                    </h3>
-                    <span style={{ fontSize: '18px' }}>{showVacation ? '▲' : '▼'}</span>
-                  </div>
-{showVacation && (
-  <div style={{ 
-    padding: '10px', 
-    borderTop: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
-    backgroundColor: isDarkMode ? '#1e293b' : '#f8fafc',
-    borderRadius: '0 0 8px 8px'
-  }}>
-    {vacationData.filter(v => v.date === homeDate).length === 0 ? (
-      <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '14px', padding: '10px' }}>오늘 휴가자가 없습니다.</div>
-    ) : (
-      vacationData.filter(v => v.date === homeDate).map((v, i) => {
-        // [로직] 휴가 종류에 따른 표시 형식 분기
-        const isVacation = v.category === 'vacation';
-        const displayLabel = isVacation ? `휴가${v.vacationSeq || ''}` : v.type;
-        const displayContent = v.dia || ""; // DIA나 비고 정보
-
-        return (
+                      {/* 🚀 홈 화면 휴가 현황 카드 (세로 배치형) */}
+<div className="card" style={{ marginTop: '15px', width: '100%' }}>
+  <div 
+    style={{ 
+      display: 'flex', 
+      justifyContent: 'space-between', 
+      alignItems: 'center', 
+      cursor: 'pointer', 
+      padding: '10px' 
+    }}
+    onClick={() => setShowVacation(!showVacation)}
+  >
+    <h3 style={{ margin: 0, fontSize: '16px', color: isDarkMode ? '#e2e8f0' : '#1e293b' }}>
+      📋 오늘 휴가 {vacationData.filter(v => v.date === homeDate).length}명 🔄
+    </h3>
+    <span style={{ fontSize: '18px' }}>{showVacation ? '▲' : '▼'}</span>
+  </div>
+  
+  {showVacation && (
+    <div style={{ 
+      padding: '10px', 
+      borderTop: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
+      backgroundColor: isDarkMode ? '#1e293b' : '#f8fafc',
+      borderRadius: '0 0 8px 8px'
+    }}>
+      {vacationData.filter(v => v.date === homeDate).length === 0 ? (
+        <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '14px', padding: '10px' }}>오늘 휴가자가 없습니다.</div>
+      ) : (
+        vacationData.filter(v => v.date === homeDate).map((v, i) => (
           <div key={i} style={{ 
             display: 'flex', 
-            justifyContent: 'space-between',
-            padding: '4px 0',
+            justifyContent: 'flex-start', // 좌측 정렬
+            alignItems: 'center',
+            padding: '5px 0',
             fontSize: '14px',
-            color: isDarkMode ? '#cbd5e1' : '#475569'
+            color: isDarkMode ? '#cbd5e1' : '#475569',
+            gap: '8px' // 이모지-텍스트 간격
           }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              {/* 카테고리별 이모지 */}
-              {isVacation ? '🏖️' : v.category === 'sick' ? '🏥' : v.category === 'education' ? '📚' : v.category === 'union' ? '✊' : '⬜'}
-              {/* 표시 형식: 휴가1 - 22d / 병가 - 5d 등 */}
-              <span style={{ fontWeight: 'bold' }}>{displayLabel}</span>
-              <span>-</span>
-              <span>{displayContent}</span>
+            <span>{v.category === 'vacation' ? '🏖️' : v.category === 'sick' ? '🏥' : v.category === 'education' ? '📚' : '⬜'}</span>
+            <span style={{ fontWeight: 'bold', minWidth: '60px' }}>
+              {v.category === 'vacation' ? `휴가${v.vacationSeq || ''}` : v.type}
             </span>
+            <span>-</span>
+            <span>{v.dia || ""}</span>
           </div>
-        );
-      })
-    )}
-  </div>
-)}
-                </div>
+        ))
+      )}
+    </div>
+  )}
+</div>
                 </div>
               </>
             )}
