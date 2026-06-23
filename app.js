@@ -1598,7 +1598,7 @@ useEffect(() => {
                     )}
                   </div> {/* main-panel 닫기 */}
   
- {/* 🚀 독립형 휴가 현황 카드 */}
+ {/* 🚀 휴가 현황 카드 (독립 배치) */}
                 <div className="card" style={{ marginTop: '20px', width: '100%' }}>
                   <div 
                     style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', padding: '15px' }}
