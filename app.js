@@ -1608,22 +1608,44 @@ useEffect(() => {
                     </h3>
                     <span style={{ fontSize: '18px' }}>{showVacation ? '▲' : '▼'}</span>
                   </div>
-                  {showVacation && (
-                    <div style={{ marginTop: '10px', borderTop: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0', paddingTop: '10px' }}>
-                      {vacationData.filter(v => v.date === homeDate).length === 0 ? (
-                        <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '14px' }}>오늘 휴가자가 없습니다.</div>
-                      ) : (
-                        vacationData.filter(v => v.date === homeDate).map((v, i) => (
-                          <div key={i} style={{ marginBottom: '8px', fontSize: '14px', color: isDarkMode ? '#cbd5e1' : '#475569', display: 'flex', gap: '8px' }}>
-                            <span>{v.category === 'vacation' ? '🏖️' : v.category === 'sick' ? '🏥' : '⬜'}</span>
-                            <span style={{ fontWeight: 'bold' }}>{v.name}</span>
-                            <span>{v.type}</span>
-                            <span>({v.dia})</span>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  )}
+{showVacation && (
+  <div style={{ 
+    padding: '10px', 
+    borderTop: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
+    backgroundColor: isDarkMode ? '#1e293b' : '#f8fafc',
+    borderRadius: '0 0 8px 8px'
+  }}>
+    {vacationData.filter(v => v.date === homeDate).length === 0 ? (
+      <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '14px', padding: '10px' }}>오늘 휴가자가 없습니다.</div>
+    ) : (
+      vacationData.filter(v => v.date === homeDate).map((v, i) => {
+        // [로직] 휴가 종류에 따른 표시 형식 분기
+        const isVacation = v.category === 'vacation';
+        const displayLabel = isVacation ? `휴가${v.vacationSeq || ''}` : v.type;
+        const displayContent = v.dia || ""; // DIA나 비고 정보
+
+        return (
+          <div key={i} style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between',
+            padding: '4px 0',
+            fontSize: '14px',
+            color: isDarkMode ? '#cbd5e1' : '#475569'
+          }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              {/* 카테고리별 이모지 */}
+              {isVacation ? '🏖️' : v.category === 'sick' ? '🏥' : v.category === 'education' ? '📚' : v.category === 'union' ? '✊' : '⬜'}
+              {/* 표시 형식: 휴가1 - 22d / 병가 - 5d 등 */}
+              <span style={{ fontWeight: 'bold' }}>{displayLabel}</span>
+              <span>-</span>
+              <span>{displayContent}</span>
+            </span>
+          </div>
+        );
+      })
+    )}
+  </div>
+)}
                 </div>
                 </div>
               </>
