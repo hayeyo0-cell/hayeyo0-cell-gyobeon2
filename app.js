@@ -135,6 +135,25 @@ function getVacationCountColor(count, dateStr) {
   return '#ef4444';                                // 🔴 빨강 (보장+2 이상)
 }
 
+// 🆕 색상 계산에서 제외할 휴가 판별
+// 제외 대상: 병가, 병가비, 공란, 교육, 노조, 청휴, 청휴비, 출장, 교휴(공휴), 대체휴무
+function isExcludedFromColorCount(vacation) {
+  // 카테고리 기준 제외 (병가, 교육, 노조, 공란)
+  const excludedCategories = ['sick', 'education', 'union', 'empty'];
+  if (excludedCategories.includes(vacation.category)) return true;
+  
+  // 휴가명 기준 추가 제외 (청휴, 청휴비, 출장, 교휴, 공휴, 대체휴무, 병가)
+  const type = String(vacation.type || '').trim();
+  const excludedKeywords = ['청휴', '출장', '교휴', '공휴', '대체휴무', '병가'];
+  return excludedKeywords.some(keyword => type.includes(keyword));
+}
+
+// 🆕 색상 계산용 휴가자 수 (제외 항목 빼고 카운트)
+function getVacationsForColorCount(vacations) {
+  if (!Array.isArray(vacations)) return 0;
+  return vacations.filter(v => !isExcludedFromColorCount(v)).length;
+}
+
 function parseLines(text) { return String(text || "").replace(/\r/g, "").split("\n").map((v) => v.trim()).filter(Boolean); }
 function parseInfo(text) {
   const lines = parseLines(text); const tokens = lines.join(" ").split(/\s+/).filter(Boolean);
@@ -1935,8 +1954,9 @@ function App() {
                               </div>
                               {mySelection?.teamKey === 'ks' && sameMonth && (() => {
                                 const dayVacs = vacationsByDate[date] || [];
-                                const count = dayVacs.length;
-                                const color = getVacationCountColor(count, date);
+                                const totalCount = dayVacs.length;  // 표시용 (전체)
+                                const colorCount = getVacationsForColorCount(dayVacs);  // 색상용 (제외 빼고)
+                                const color = getVacationCountColor(colorCount, date);
                                 return (
                                   <div
                                     onClick={(e) => {
@@ -1960,7 +1980,7 @@ function App() {
                                       margin: '4px auto 0 auto'
                                     }}
                                   >
-                                    {count}
+                                    {totalCount}
                                   </div>
                                 );
                               })()}
