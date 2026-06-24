@@ -137,7 +137,9 @@ function getVacationCountColor(count, dateStr, allVacations = []) {
   
   // 휴가자 중 비번이 1명이라도 있으면 보장 +1 (수와 상관없이)
   // 비번 판별: DIA에 "비번" 포함 (예: "26비번") 또는 "휴X" 시작
+  // 단, 색상 카운트에서 제외된 휴가자(공란/병가/교육 등)의 비번은 무시
   const hasOffDuty = (Array.isArray(allVacations) ? allVacations : []).some(v => {
+    if (isExcludedFromColorCount(v)) return false;  // 제외 대상의 비번은 무시
     const dia = String(v.dia || '').trim();
     return dia.includes('비번') || dia.startsWith('휴');
   });
