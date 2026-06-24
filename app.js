@@ -135,10 +135,11 @@ function getVacationCountColor(count, dateStr, allVacations = []) {
   const dayType = guessDayType(dateStr);
   const baseGuaranteed = VACATION_GUARANTEED[dayType] || 4;
   
-  // 휴가자 중 비번(휴X)이 1명이라도 있으면 보장 +1 (수와 상관없이)
+  // 휴가자 중 비번이 1명이라도 있으면 보장 +1 (수와 상관없이)
+  // 비번 판별: DIA에 "비번" 포함 (예: "26비번") 또는 "휴X" 시작
   const hasOffDuty = (Array.isArray(allVacations) ? allVacations : []).some(v => {
     const dia = String(v.dia || '').trim();
-    return dia.startsWith('휴');
+    return dia.includes('비번') || dia.startsWith('휴');
   });
   const offDutyBonus = hasOffDuty ? 1 : 0;
   
