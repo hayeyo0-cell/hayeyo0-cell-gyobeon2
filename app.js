@@ -127,12 +127,26 @@ function getDateToneClass(dateStr) { if (isSunday(dateStr) || isHolidayDate(date
 function getDateBasedColor(dateStr) { if (isSunday(dateStr) || isHolidayDate(dateStr)) return "#ef4444"; if (isSaturday(dateStr)) return "#2563eb"; return "inherit"; }
 
 // 🆕 휴가자 수에 따른 색상 계산
-function getVacationCountColor(count, dateStr) {
+// 보장 인원: 평일 4(비번 포함 시 5), 토 5(비번 포함 시 6), 휴/일 7(비번 포함 시 8)
+// 🔴 빨강: 보장 인원 달성/초과 (더 받을 자리 없음)
+// 🟡 노랑: 보장-1 (마지막 1자리 남음)
+// 🟢 초록: 여유 있음
+function getVacationCountColor(count, dateStr, allVacations = []) {
   const dayType = guessDayType(dateStr);
-  const guaranteed = VACATION_GUARANTEED[dayType] || 4;
-  if (count <= guaranteed - 1) return '#10b981';  // 🟢 초록 (보장-1 이하)
-  if (count <= guaranteed + 1) return '#f59e0b';  // 🟡 노랑 (보장 ~ 보장+1)
-  return '#ef4444';                                // 🔴 빨강 (보장+2 이상)
+  const baseGuaranteed = VACATION_GUARANTEED[dayType] || 4;
+  
+  // 휴가자 중 비번(휴X)이 1명이라도 있으면 보장 +1 (수와 상관없이)
+  const hasOffDuty = (Array.isArray(allVacations) ? allVacations : []).some(v => {
+    const dia = String(v.dia || '').trim();
+    return dia.startsWith('휴');
+  });
+  const offDutyBonus = hasOffDuty ? 1 : 0;
+  
+  const guaranteed = baseGuaranteed + offDutyBonus;
+  
+  if (count >= guaranteed) return '#ef4444';       // 🔴 빨강 (보장 달성/초과)
+  if (count >= guaranteed - 1) return '#f59e0b';   // 🟡 노랑 (보장-1)
+  return '#10b981';                                 // 🟢 초록 (여유)
 }
 
 // 🆕 색상 계산에서 제외할 휴가 판별
@@ -1956,7 +1970,7 @@ function App() {
                                 const dayVacs = vacationsByDate[date] || [];
                                 const totalCount = dayVacs.length;  // 표시용 (전체)
                                 const colorCount = getVacationsForColorCount(dayVacs);  // 색상용 (제외 빼고)
-                                const color = getVacationCountColor(colorCount, date);
+                                const color = getVacationCountColor(colorCount, date, dayVacs);  // 비번 보너스 적용
                                 return (
                                   <div
                                     onClick={(e) => {
