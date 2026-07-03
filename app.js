@@ -711,6 +711,24 @@ function App() {
   const [postSetupRemoteCheckNeeded, setPostSetupRemoteCheckNeeded] = useState(false);
 
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem(LS_DARK_MODE) === 'true');
+  
+  // 🆕 계절 테마 기능
+  const getCurrentSeason = () => {
+    const month = new Date().getMonth() + 1;
+    if (month >= 3 && month <= 5) return 'spring';
+    if (month >= 6 && month <= 8) return 'summer';
+    if (month >= 9 && month <= 11) return 'autumn';
+    return 'winter';
+  };
+  const [currentTheme, setCurrentTheme] = useState(() => 
+    localStorage.getItem('selectedTheme') || getCurrentSeason()
+  );
+  
+  const changeTheme = (newTheme) => {
+    setCurrentTheme(newTheme);
+    localStorage.setItem('selectedTheme', newTheme);
+  };
+
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [swipeTransition, setSwipeTransition] = useState("");
 
@@ -1658,7 +1676,7 @@ function App() {
   return (
     <>
       <div 
-        className="container"
+        className={`container theme-${currentTheme}`}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEndHandler}
@@ -2117,6 +2135,57 @@ function App() {
               <span>{isDarkMode ? "🌙 다크 모드 켜짐" : "☀️ 라이트 모드 켜짐"}</span>
               <span style={{ fontSize: '18px' }}>{isDarkMode ? "✅" : "☑️"}</span>
             </button>
+            <label className="label" style={{ marginTop: 12 }}>계절 테마</label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '8px', marginBottom: 16 }}>
+              <button 
+                className="modal-btn"
+                style={{ 
+                  background: currentTheme === 'spring' ? '#ffb3d9' : '#fff5f7',
+                  color: currentTheme === 'spring' ? 'white' : '#333',
+                  fontWeight: currentTheme === 'spring' ? 'bold' : 'normal',
+                  border: currentTheme === 'spring' ? '2px solid #ff69b4' : '1px solid #ddd'
+                }}
+                onClick={() => changeTheme('spring')}
+              >
+                🌸 봄
+              </button>
+              <button 
+                className="modal-btn"
+                style={{ 
+                  background: currentTheme === 'summer' ? '#1890ff' : '#e6f7ff',
+                  color: currentTheme === 'summer' ? 'white' : '#333',
+                  fontWeight: currentTheme === 'summer' ? 'bold' : 'normal',
+                  border: currentTheme === 'summer' ? '2px solid #0050b3' : '1px solid #ddd'
+                }}
+                onClick={() => changeTheme('summer')}
+              >
+                ☀️ 여름
+              </button>
+              <button 
+                className="modal-btn"
+                style={{ 
+                  background: currentTheme === 'autumn' ? '#ff9c6e' : '#fff9f0',
+                  color: currentTheme === 'autumn' ? 'white' : '#333',
+                  fontWeight: currentTheme === 'autumn' ? 'bold' : 'normal',
+                  border: currentTheme === 'autumn' ? '2px solid #d4380d' : '1px solid #ddd'
+                }}
+                onClick={() => changeTheme('autumn')}
+              >
+                🍂 가을
+              </button>
+              <button 
+                className="modal-btn"
+                style={{ 
+                  background: currentTheme === 'winter' ? '#9254de' : '#f0f5ff',
+                  color: currentTheme === 'winter' ? 'white' : '#333',
+                  fontWeight: currentTheme === 'winter' ? 'bold' : 'normal',
+                  border: currentTheme === 'winter' ? '2px solid #531dab' : '1px solid #ddd'
+                }}
+                onClick={() => changeTheme('winter')}
+              >
+                ❄️ 겨울
+              </button>
+            </div>
             <label className="label">기본자료 ZIP 등록 / 변경</label>
             <input type="file" accept=".zip" className="input" onChange={handleZipUpload} />
             {!allowProfileEdit ? (
@@ -2396,6 +2465,63 @@ function App() {
       )}
       
       <style>{`
+        /* 🆕 계절 테마 CSS */
+        .theme-spring {
+          background-color: #fff5f7 !important;
+        }
+        .theme-spring .settings-btn,
+        .theme-spring .quick-btn,
+        .theme-spring .install-btn,
+        .theme-spring .all-tab-header .all-header,
+        .theme-spring .month-header-bar .month-nav-btn {
+          background: linear-gradient(180deg, #ffb3d9 0%, #c3f0ca 100%) !important;
+        }
+        .theme-spring .bottom-tabs {
+          background: #52c41a !important;
+        }
+
+        .theme-summer {
+          background-color: #e6f7ff !important;
+        }
+        .theme-summer .settings-btn,
+        .theme-summer .quick-btn,
+        .theme-summer .install-btn,
+        .theme-summer .all-tab-header .all-header,
+        .theme-summer .month-header-bar .month-nav-btn {
+          background: linear-gradient(180deg, #1890ff 0%, #52c41a 100%) !important;
+        }
+        .theme-summer .bottom-tabs {
+          background: #1890ff !important;
+        }
+
+        .theme-autumn {
+          background-color: #fff9f0 !important;
+        }
+        .theme-autumn .settings-btn,
+        .theme-autumn .quick-btn,
+        .theme-autumn .install-btn,
+        .theme-autumn .all-tab-header .all-header,
+        .theme-autumn .month-header-bar .month-nav-btn {
+          background: linear-gradient(180deg, #ff9c6e 0%, #d4380d 100%) !important;
+        }
+        .theme-autumn .bottom-tabs {
+          background: #ff9c6e !important;
+        }
+
+        .theme-winter {
+          background-color: #f0f5ff !important;
+        }
+        .theme-winter .settings-btn,
+        .theme-winter .quick-btn,
+        .theme-winter .install-btn,
+        .theme-winter .all-tab-header .all-header,
+        .theme-winter .month-header-bar .month-nav-btn {
+          background: linear-gradient(180deg, #9254de 0%, #1890ff 100%) !important;
+        }
+        .theme-winter .bottom-tabs {
+          background: #9254de !important;
+        }
+
         .bottom-tabs {
           padding-bottom: env(safe-area-inset-bottom, 0px) !important;
         }
