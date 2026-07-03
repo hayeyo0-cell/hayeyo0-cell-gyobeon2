@@ -2130,12 +2130,7 @@ function App() {
         <div className="modal-backdrop" onClick={() => { if (showSettingsRef.current) window.history.back(); else setShowSettings(false); }}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-title">설정</div>
-            <label className="label" style={{ marginTop: 6 }}>화면 테마</label>
-            <button className="modal-btn" style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 16px', marginBottom: 16 }} onClick={() => setIsDarkMode(!isDarkMode)}>
-              <span>{isDarkMode ? "🌙 다크 모드 켜짐" : "☀️ 라이트 모드 켜짐"}</span>
-              <span style={{ fontSize: '18px' }}>{isDarkMode ? "✅" : "☑️"}</span>
-            </button>
-            <label className="label" style={{ marginTop: 12 }}>계절 테마</label>
+            <label className="label" style={{ marginTop: 6 }}>계절 테마</label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '8px', marginBottom: 16 }}>
               <button 
                 className="modal-btn"
@@ -2143,7 +2138,8 @@ function App() {
                   background: currentTheme === 'spring' ? '#ffb3d9' : '#fff5f7',
                   color: currentTheme === 'spring' ? 'white' : '#333',
                   fontWeight: currentTheme === 'spring' ? 'bold' : 'normal',
-                  border: currentTheme === 'spring' ? '2px solid #ff69b4' : '1px solid #ddd'
+                  border: currentTheme === 'spring' ? '2px solid #ff69b4' : '1px solid #ddd',
+                  padding: '10px 8px'
                 }}
                 onClick={() => changeTheme('spring')}
               >
@@ -2155,7 +2151,8 @@ function App() {
                   background: currentTheme === 'summer' ? '#1890ff' : '#e6f7ff',
                   color: currentTheme === 'summer' ? 'white' : '#333',
                   fontWeight: currentTheme === 'summer' ? 'bold' : 'normal',
-                  border: currentTheme === 'summer' ? '2px solid #0050b3' : '1px solid #ddd'
+                  border: currentTheme === 'summer' ? '2px solid #0050b3' : '1px solid #ddd',
+                  padding: '10px 8px'
                 }}
                 onClick={() => changeTheme('summer')}
               >
@@ -2167,7 +2164,8 @@ function App() {
                   background: currentTheme === 'autumn' ? '#ff9c6e' : '#fff9f0',
                   color: currentTheme === 'autumn' ? 'white' : '#333',
                   fontWeight: currentTheme === 'autumn' ? 'bold' : 'normal',
-                  border: currentTheme === 'autumn' ? '2px solid #d4380d' : '1px solid #ddd'
+                  border: currentTheme === 'autumn' ? '2px solid #d4380d' : '1px solid #ddd',
+                  padding: '10px 8px'
                 }}
                 onClick={() => changeTheme('autumn')}
               >
@@ -2179,13 +2177,19 @@ function App() {
                   background: currentTheme === 'winter' ? '#9254de' : '#f0f5ff',
                   color: currentTheme === 'winter' ? 'white' : '#333',
                   fontWeight: currentTheme === 'winter' ? 'bold' : 'normal',
-                  border: currentTheme === 'winter' ? '2px solid #531dab' : '1px solid #ddd'
+                  border: currentTheme === 'winter' ? '2px solid #531dab' : '1px solid #ddd',
+                  padding: '10px 8px'
                 }}
                 onClick={() => changeTheme('winter')}
               >
                 ❄️ 겨울
               </button>
             </div>
+            <label className="label" style={{ marginTop: 12 }}>화면 모드</label>
+            <button className="modal-btn" style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 16px', marginBottom: 16 }} onClick={() => setIsDarkMode(!isDarkMode)}>
+              <span>{isDarkMode ? "🌙 다크 모드 켜짐" : "☀️ 라이트 모드 켜짐"}</span>
+              <span style={{ fontSize: '18px' }}>{isDarkMode ? "✅" : "☑️"}</span>
+            </button>
             <label className="label">기본자료 ZIP 등록 / 변경</label>
             <input type="file" accept=".zip" className="input" onChange={handleZipUpload} />
             {!allowProfileEdit ? (
