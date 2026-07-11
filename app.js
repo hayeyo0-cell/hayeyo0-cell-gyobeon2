@@ -2327,7 +2327,7 @@ function App() {
             {mySelection?.name ? (
             <div style={{ marginTop: 16, paddingTop: 16, borderTop: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0' }}>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8, color: isDarkMode ? '#cbd5e1' : '#334155' }}>
-                📝 메모 (수동 관리) - {pathTarget?.code || "행로표"}
+                📝 메모 - {pathTarget?.code || "행로표"}
               </div>
               <textarea
                 value={memoText}
