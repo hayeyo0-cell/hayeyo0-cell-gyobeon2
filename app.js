@@ -24,8 +24,8 @@ const TEAM_ORDER = ["ks", "my", "wb", "as"];
 const NIGHT_RANGE_BY_TEAM = { ks: { start: 21, end: 29 }, my: { start: 24, end: 34 }, wb: { start: 25, end: 37 }, as: { start: 25, end: 37 } };
 
 const ADMIN_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8NMVjH3J_Mt7SBymWOg44zvD4gd4GXkQB3r95QTl63M3aWqtf-OglLrG2rQPH7J6UjA/exec";
-const ADMIN_NAME = "권재림";
-const ADMIN_PASSWORD = "7717tutu";
+const ADMIN_NAME = ["권재림", "조영빈"];
+const ADMIN_PASSWORD = "ks5826";
 const KS_BAND_URL = "https://band.us/band/51746678/chat/C4U1ay";
 const KS_VACATION_URL = "https://docs.google.com/spreadsheets/d/16ao5ogtUlILby9a7PjIoUpU9e-lLh8c_jHJGjtWAleM/edit?usp=drivesdk";
 
@@ -632,6 +632,14 @@ function groupVacationsByDate(vacations) {
   return result;
 }
 
+// 🆕 메모 관련 함수들 (사용자명 + 날짜 + DIA) - 개인 수첩 기능
+function getMemoKey(userName, dateStr, diaCode) { return `gyobeon_memo_${String(userName || "").trim()}_${dateStr}_${String(diaCode || "").trim()}`; }
+function loadMemo(userName, dateStr, diaCode) { try { return localStorage.getItem(getMemoKey(userName, dateStr, diaCode)) || ""; } catch { return ""; } }
+function saveMemo(userName, dateStr, text, diaCode) { try { localStorage.setItem(getMemoKey(userName, dateStr, diaCode), String(text || "").trim()); } catch (_) {} }
+function deleteMemo(userName, dateStr, diaCode) { try { localStorage.removeItem(getMemoKey(userName, dateStr, diaCode)); } catch (_) {} }
+// 🆕 해당 날짜의 모든 메모 초기화 (수동 호출)
+function clearAllMemosForDate(userName, dateStr) { try { const keys = Object.keys(localStorage); keys.forEach(key => { if (key.startsWith(`gyobeon_memo_${String(userName || "").trim()}_${dateStr}_`)) { localStorage.removeItem(key); } }); } catch (_) {} }
+
 function promptAdminPassword() { const value = window.prompt("관리자 비밀번호를 입력하세요"); if (value == null) return null; if (String(value).trim() !== ADMIN_PASSWORD) { alert("비밀번호가 올바르지 않습니다."); return null; } return String(value).trim(); }
 function App() {
   const initialSelection = loadMySelection();
@@ -693,6 +701,7 @@ function App() {
   const [pathImage, setPathImage] = useState("");
   const [pathTeamKey, setPathTeamKey] = useState("");
   const [pathDate, setPathDate] = useState(todayStr);
+  const [memoText, setMemoText] = useState("");
   const [showSettings, setShowSettings] = useState(false);
   const [allowProfileEdit, setAllowProfileEdit] = useState(!initialSelection?.name || !initialSelection?.code);
 
@@ -711,24 +720,6 @@ function App() {
   const [postSetupRemoteCheckNeeded, setPostSetupRemoteCheckNeeded] = useState(false);
 
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem(LS_DARK_MODE) === 'true');
-  
-  // 🆕 계절 테마 기능
-  const getCurrentSeason = () => {
-    const month = new Date().getMonth() + 1;
-    if (month >= 3 && month <= 5) return 'spring';
-    if (month >= 6 && month <= 8) return 'summer';
-    if (month >= 9 && month <= 11) return 'autumn';
-    return 'winter';
-  };
-  const [currentTheme, setCurrentTheme] = useState(() => 
-    localStorage.getItem('selectedTheme') || getCurrentSeason()
-  );
-  
-  const changeTheme = (newTheme) => {
-    setCurrentTheme(newTheme);
-    localStorage.setItem('selectedTheme', newTheme);
-  };
-
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [swipeTransition, setSwipeTransition] = useState("");
 
@@ -751,7 +742,7 @@ function App() {
   const effectiveData = data;
   const setupSourceData = useMemo(() => { if (!data) return null; if (!allowProfileEdit) return data; return applyRemoteRosterNamesForSetup(data, remoteRoster); }, [data, remoteRoster, allowProfileEdit]);
 
-  const isAdminUser = samePersonName(mySelection?.name, ADMIN_NAME);
+  const isAdminUser = ADMIN_NAME.includes(mySelection?.name);
   const isKsUser = mySelection?.teamKey === "ks";
 
   const groupAddCandidates = useMemo(() => {
@@ -1079,6 +1070,8 @@ function App() {
   }, [showUpdatePopup, searchQuery]);
 
   useEffect(() => { if (pathOpen && (!window.history.state || window.history.state.layer !== "path")) window.history.pushState({ __gyobeon: true, layer: "path" }, ""); }, [pathOpen]);
+  // 🆕 행로표 열때 메모 로드 (사용자명 + 날짜 + DIA)
+  useEffect(() => { if (pathOpen && pathDate && pathTarget?.code && mySelection?.name) { setMemoText(loadMemo(mySelection.name, pathDate, pathTarget.code)); } }, [pathOpen, pathDate, pathTarget?.code, mySelection?.name]);
   useEffect(() => { if (editOpen && (!window.history.state || window.history.state.layer !== "edit")) window.history.pushState({ __gyobeon: true, layer: "edit" }, ""); }, [editOpen]);
   useEffect(() => { if (showUpdatePopup && (!window.history.state || window.history.state.layer !== "update")) window.history.pushState({ __gyobeon: true, layer: "update" }, ""); }, [showUpdatePopup]);
   useEffect(() => { if (showGroupAdd && (!window.history.state || window.history.state.layer !== "groupAdd")) window.history.pushState({ __gyobeon: true, layer: "groupAdd" }, ""); }, [showGroupAdd]);
@@ -1676,7 +1669,7 @@ function App() {
   return (
     <>
       <div 
-        className={`container theme-${currentTheme}`}
+        className="container"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEndHandler}
@@ -2130,62 +2123,7 @@ function App() {
         <div className="modal-backdrop" onClick={() => { if (showSettingsRef.current) window.history.back(); else setShowSettings(false); }}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-title">설정</div>
-            <label className="label" style={{ marginTop: 6 }}>계절 테마</label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '8px', marginBottom: 16 }}>
-              <button 
-                className="modal-btn"
-                style={{ 
-                  background: currentTheme === 'spring' ? '#ffb3d9' : '#fff5f7',
-                  color: currentTheme === 'spring' ? 'white' : '#333',
-                  fontWeight: currentTheme === 'spring' ? 'bold' : 'normal',
-                  border: currentTheme === 'spring' ? '2px solid #ff69b4' : '1px solid #ddd',
-                  padding: '10px 8px'
-                }}
-                onClick={() => changeTheme('spring')}
-              >
-                🌸 봄
-              </button>
-              <button 
-                className="modal-btn"
-                style={{ 
-                  background: currentTheme === 'summer' ? '#1890ff' : '#e6f7ff',
-                  color: currentTheme === 'summer' ? 'white' : '#333',
-                  fontWeight: currentTheme === 'summer' ? 'bold' : 'normal',
-                  border: currentTheme === 'summer' ? '2px solid #0050b3' : '1px solid #ddd',
-                  padding: '10px 8px'
-                }}
-                onClick={() => changeTheme('summer')}
-              >
-                ☀️ 여름
-              </button>
-              <button 
-                className="modal-btn"
-                style={{ 
-                  background: currentTheme === 'autumn' ? '#ff9c6e' : '#fff9f0',
-                  color: currentTheme === 'autumn' ? 'white' : '#333',
-                  fontWeight: currentTheme === 'autumn' ? 'bold' : 'normal',
-                  border: currentTheme === 'autumn' ? '2px solid #d4380d' : '1px solid #ddd',
-                  padding: '10px 8px'
-                }}
-                onClick={() => changeTheme('autumn')}
-              >
-                🍂 가을
-              </button>
-              <button 
-                className="modal-btn"
-                style={{ 
-                  background: currentTheme === 'winter' ? '#9254de' : '#f0f5ff',
-                  color: currentTheme === 'winter' ? 'white' : '#333',
-                  fontWeight: currentTheme === 'winter' ? 'bold' : 'normal',
-                  border: currentTheme === 'winter' ? '2px solid #531dab' : '1px solid #ddd',
-                  padding: '10px 8px'
-                }}
-                onClick={() => changeTheme('winter')}
-              >
-                ❄️ 겨울
-              </button>
-            </div>
-            <label className="label" style={{ marginTop: 12 }}>화면 모드</label>
+            <label className="label" style={{ marginTop: 6 }}>화면 테마</label>
             <button className="modal-btn" style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 16px', marginBottom: 16 }} onClick={() => setIsDarkMode(!isDarkMode)}>
               <span>{isDarkMode ? "🌙 다크 모드 켜짐" : "☀️ 라이트 모드 켜짐"}</span>
               <span style={{ fontSize: '18px' }}>{isDarkMode ? "✅" : "☑️"}</span>
@@ -2384,6 +2322,108 @@ function App() {
               )}
             </div>
             {pathImage ? (<img src={pathImage} alt="행로표" className="fullscreen-image" />) : (<div className="empty-box">해당 행로표 이미지를 찾지 못했습니다.</div>)}
+            
+            {/* 🆕 메모 섹션 - 개인 수첩 (사용자 설정 필수) */}
+            {mySelection?.name ? (
+            <div style={{ marginTop: 16, paddingTop: 16, borderTop: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8, color: isDarkMode ? '#cbd5e1' : '#334155' }}>
+                📝 메모 (매일 자동 리셋) - {pathTarget?.code || "행로표"}
+              </div>
+              <textarea
+                value={memoText}
+                onChange={(e) => setMemoText(e.target.value)}
+                placeholder="교대사항, 고장 내용 등을 기록하세요..."
+                style={{
+                  width: '100%',
+                  minHeight: '80px',
+                  padding: '10px 12px',
+                  borderRadius: '12px',
+                  border: isDarkMode ? '1px solid #334155' : '1px solid #c8d2e3',
+                  background: isDarkMode ? '#0f172a' : '#ffffff',
+                  color: isDarkMode ? '#e2e8f0' : '#1e293b',
+                  fontSize: '14px',
+                  fontFamily: 'inherit',
+                  resize: 'vertical',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+              />
+              <div style={{ display: 'flex', gap: '8px', marginTop: 10 }}>
+                <button
+                  onClick={() => {
+                    saveMemo(mySelection?.name, pathDate, memoText, pathTarget?.code);
+                    alert('메모가 저장되었습니다.');
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '12px 16px',
+                    background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontWeight: 700,
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 8px rgba(59, 130, 246, 0.2)'
+                  }}
+                >
+                  💾 저장
+                </button>
+                <button
+                  onClick={() => {
+                    if (window.confirm('메모를 삭제하시겠습니까?')) {
+                      deleteMemo(mySelection?.name, pathDate, pathTarget?.code);
+                      setMemoText('');
+                      alert('메모가 삭제되었습니다.');
+                    }
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '12px 16px',
+                    background: isDarkMode ? '#ef4444' : '#fca5a5',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontWeight: 700,
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 8px rgba(239, 68, 68, 0.2)'
+                  }}
+                >
+                  🗑️ 삭제
+                </button>
+              </div>
+              {/* 🆕 메모 초기화 버튼 - 해당 날짜의 모든 메모 삭제 */}
+              <button
+                onClick={() => {
+                  if (window.confirm(`${pathDate}의 모든 메모를 초기화하시겠습니까?\n(이 작업은 되돌릴 수 없습니다)`)) {
+                    clearAllMemosForDate(mySelection?.name, pathDate);
+                    setMemoText('');
+                    alert('모든 메모가 초기화되었습니다.');
+                  }
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  marginTop: 10,
+                  background: isDarkMode ? '#64748b' : '#cbd5e1',
+                  color: isDarkMode ? 'white' : '#1e293b',
+                  border: 'none',
+                  borderRadius: '12px',
+                  fontWeight: 700,
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 8px rgba(100, 116, 139, 0.2)'
+                }}
+              >
+                🔄 메모 초기화 (모두 삭제)
+              </button>
+            </div>
+            ) : (
+              <div style={{ marginTop: 16, padding: '12px', borderRadius: '12px', background: isDarkMode ? '#1e293b' : '#f0f9ff', color: isDarkMode ? '#cbd5e1' : '#0c4a6e', fontSize: '14px', textAlign: 'center', fontWeight: 600 }}>
+                ⚠️ 메모를 사용하려면 설정에서 내 정보를 먼저 입력해주세요.
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -2469,63 +2509,6 @@ function App() {
       )}
       
       <style>{`
-        /* 🆕 계절 테마 CSS */
-        .theme-spring {
-          background-color: #fff5f7 !important;
-        }
-        .theme-spring .settings-btn,
-        .theme-spring .quick-btn,
-        .theme-spring .install-btn,
-        .theme-spring .all-tab-header .all-header,
-        .theme-spring .month-header-bar .month-nav-btn {
-          background: linear-gradient(180deg, #ffb3d9 0%, #c3f0ca 100%) !important;
-        }
-        .theme-spring .bottom-tabs {
-          background: #52c41a !important;
-        }
-
-        .theme-summer {
-          background-color: #e6f7ff !important;
-        }
-        .theme-summer .settings-btn,
-        .theme-summer .quick-btn,
-        .theme-summer .install-btn,
-        .theme-summer .all-tab-header .all-header,
-        .theme-summer .month-header-bar .month-nav-btn {
-          background: linear-gradient(180deg, #1890ff 0%, #52c41a 100%) !important;
-        }
-        .theme-summer .bottom-tabs {
-          background: #1890ff !important;
-        }
-
-        .theme-autumn {
-          background-color: #fff9f0 !important;
-        }
-        .theme-autumn .settings-btn,
-        .theme-autumn .quick-btn,
-        .theme-autumn .install-btn,
-        .theme-autumn .all-tab-header .all-header,
-        .theme-autumn .month-header-bar .month-nav-btn {
-          background: linear-gradient(180deg, #ff9c6e 0%, #d4380d 100%) !important;
-        }
-        .theme-autumn .bottom-tabs {
-          background: #ff9c6e !important;
-        }
-
-        .theme-winter {
-          background-color: #f0f5ff !important;
-        }
-        .theme-winter .settings-btn,
-        .theme-winter .quick-btn,
-        .theme-winter .install-btn,
-        .theme-winter .all-tab-header .all-header,
-        .theme-winter .month-header-bar .month-nav-btn {
-          background: linear-gradient(180deg, #9254de 0%, #1890ff 100%) !important;
-        }
-        .theme-winter .bottom-tabs {
-          background: #9254de !important;
-        }
-
         .bottom-tabs {
           padding-bottom: env(safe-area-inset-bottom, 0px) !important;
         }
